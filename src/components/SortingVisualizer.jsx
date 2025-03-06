@@ -22,12 +22,27 @@ const SortingVisualizer = () => {
   const generateNewArray = () => {
     if (isSorting) return; // Prevent changing the array during sorting
     const newArr = Array.from({ length: arraySize }, () =>
+      // Generates a random array of numbers between 0 and 500
       Math.floor(Math.random() * 500)
     );
     setArray(newArr);
     setStatusMessage("New array generated!");
   };
-
+/*
+-> animateSorting function is used to visually animate the proces of sorting an array
+-> animateSorting function takes an array of animations as input. Each animation is an array containg three elements.
+   1. barIndex: the index of the bar element in the DOM
+   2. newHeight: The new height for the bar
+   3. action: the type of action being performed( eg. 'compare', 'swap','shift', 'insert').
+   eg. const animations = [
+    [0, 100, 'compare'],
+    [1, 150, 'swap'],
+    [2, 200, 'insert']
+];
+-> after all animation have been processes, another setTimeout is used to update the status message and 
+se "isSorting" to false after a total delay of "animations.length*sortingSpeed" milliseconds. This ensure that the sorting
+completion message is dispalyed only after all animations have finsished.
+*/
   const animateSorting = (animations) => {
     animations.forEach(([barIndex, newHeight, action], i) => {
       setTimeout(() => {
@@ -42,8 +57,12 @@ const SortingVisualizer = () => {
         bar.style.height = `${newHeight}px`;
 
         setTimeout(() => {
-          bar.style.backgroundColor = "blue"; // Reset color after some time
+          // after a delay of sortingSpeed milliseconds, it resets the bar's background color to blue
+          bar.style.backgroundColor = "blue"; 
         }, sortingSpeed);
+
+        // the loop uses setTimeout to delay each animation step by i*sortingSpeed milliseconds. 
+        //This ensure that animation are excuted sequentially 
       }, i * sortingSpeed);
     });
 
@@ -53,12 +72,20 @@ const SortingVisualizer = () => {
     }, animations.length * sortingSpeed);
   };
 
+  /*
+  -> mainly this fetching animation from the slected algorithm
+  -> paasing the animations to animateSorting for visualization.
+  */
   const handleSort = () => {
     if (!selectedAlgorithm) {
       alert("Please select a sorting algorithm first!");
       return;
     }
+    // setSorting(true): This ensures that while sorting is in progress, other actions like
+    // generating a new array or selecting a different algorithm are disabled.
     setIsSorting(true);
+    //  setStatusMessage("Sorting in progress..."): Updates 
+    //the UI with a message indicating that sorting has started 
     setStatusMessage("Sorting in progress...");
     let animations = [];
     switch (selectedAlgorithm) {
@@ -84,11 +111,13 @@ const SortingVisualizer = () => {
         alert("Algorithm not recognized");
         return;
     }
+    // animateSorting(animations) function is called with the list of animations
+    // obtained from the chosed sorting function.
     animateSorting(animations);
   };
 
   const resetArray = () => {
-    generateNewArray();
+    generateNewArray(); // this creates a fresh array with randomly generated numbers and updates the array state
     setStatusMessage("Array reset!");
   };
 
